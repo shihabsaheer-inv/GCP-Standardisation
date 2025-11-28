@@ -9,14 +9,15 @@ environment = "dev"
 # ═════════════════════════════════════════════════════════════════════════════
 # MODULE TOGGLES
 # ═════════════════════════════════════════════════════════════════════════════
-enable_vpc                          = false  # Set to true to enable VPC
-enable_compute_engine               = false  # Set to true to enable Compute Engine
-enable_firewall                     = false  # Set to true to enable Firewall
-enable_storage                      = true # Set to true to enable Cloud Storage
-enable_cloudsql                     = false  # Set to true to enable Cloud SQL
+enable_vpc                          = false # Set to true to enable VPC
+enable_compute_engine               = false # Set to true to enable Compute Engine
+enable_firewall                     = false # Set to true to enable Firewall
+enable_storage                      = false # Set to true to enable Cloud Storage
+enable_cloudsql                     = false # Set to true to enable Cloud SQL
+enable_cloud_spanner                = true  # Set to true to enable Cloud Spanner
 enable_cloudrun                     = false # Set to true to enable Cloud Run
 enable_cloudrun_cloudsql_connection = false # Set to true to enable Cloud SQL & Cloud Run connection
-enable_load_balancer                = false  # Set to true to enable Cloud LoadBalancer
+enable_load_balancer                = false # Set to true to enable Cloud LoadBalancer
 enable_artifact_registry            = false # Set to true to enable Artifact Registry
 enable_memorystore                  = false # Set to true to enable Memory Store
 enable_app_engine                   = false # Set to true to enable App Engine
@@ -174,15 +175,15 @@ storage_enable_versioning     = false
 storage_enable_static_website = true
 storage_index_document        = "index.html"
 storage_error_document        = "404.html"
-storage_enable_public_access  = true
+storage_enable_public_access  = false
 storage_public_access_members = ["allUsers"]
 storage_labels = {
   environment = "dev"
   team        = "devops"
 }
 
-enable_storage_admin_bindings = false
-enable_storage_viewer_bindings = true
+enable_storage_admin_bindings  = false
+enable_storage_viewer_bindings = false
 
 storage_admin_members = [
   "user:"
@@ -682,3 +683,46 @@ monitoring_per_series_aligner  = "ALIGN_MEAN"
 monitoring_notification_emails = [
   ""
 ]
+
+# ═════════════════════════════════════════════════════════════════════════════
+# CLOUD SPANNER CONFIGURATION
+# ═════════════════════════════════════════════════════════════════════════════
+# Instance configuration
+spanner_instance_id     = "dev-spanner-instance"
+spanner_instance_config = "regional-us-west1"
+
+# Use ONE of the following: num_nodes OR processing_units
+spanner_num_nodes        = 1
+spanner_processing_units = null
+
+# Database configuration
+spanner_database_name = "dev-maindb"
+
+# Optional DDL executed at creation
+spanner_database_ddl = [
+  <<EOF
+  CREATE TABLE customer (
+    customer_id STRING(36) NOT NULL,
+    name STRING(1024),
+    email STRING(1024)
+  ) PRIMARY KEY (customer_id)
+  EOF
+]
+
+# Labels
+spanner_labels = {
+  environment = "dev"
+  service     = "cloudspanner"
+}
+
+# IAM Bindings
+spanner_instance_iam_bindings = [
+  {
+    role = "roles/spanner.databaseUser"
+    members = [
+      "user:"
+    ]
+  }
+]
+
+spanner_database_iam_bindings = []

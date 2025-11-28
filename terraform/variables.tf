@@ -1948,3 +1948,60 @@ variable "enable_storage_viewer_bindings" {
   type        = bool
   default     = false
 }
+
+# ═════════════════════════════════════════════════════════════════════════════
+# CLOUD SPANNER VARIABLES
+# ═════════════════════════════════════════════════════════════════════════════
+
+variable "enable_cloud_spanner" {
+  type    = bool
+  default = false
+}
+
+variable "spanner_instance_id" {
+  type = string
+}
+
+variable "spanner_instance_config" {
+  type = string
+}
+
+variable "spanner_num_nodes" {
+  type    = number
+  default = null
+}
+
+variable "spanner_processing_units" {
+  type    = number
+  default = null
+}
+
+variable "spanner_database_name" {
+  type = string
+}
+
+variable "spanner_database_ddl" {
+  type    = list(string)
+  default = []
+}
+
+variable "spanner_labels" {
+  type    = map(string)
+  default = {}
+}
+
+variable "spanner_instance_iam_bindings" {
+  type = list(object({
+    role    = string
+    members = list(string)
+  }))
+  default = []
+}
+
+variable "spanner_database_iam_bindings" {
+  type = list(object({
+    role    = string
+    members = list(string)
+  }))
+  default = []
+}

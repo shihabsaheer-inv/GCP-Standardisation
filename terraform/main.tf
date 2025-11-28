@@ -246,7 +246,7 @@ module "load_balancer" {
   backend_protocol            = var.lb_backend_protocol
   backend_timeout             = var.lb_backend_timeout
   connection_draining_timeout = var.lb_connection_draining_timeout
-  
+
 
   # Health check configs
   health_check_port                = var.lb_health_check_port
@@ -660,3 +660,29 @@ module "iam" {
   # Custom IAM bindings (optional)
   custom_iam_bindings = var.custom_iam_bindings
 }
+
+#################################################################################################################
+#CLOUD SPANNER MODULE#
+#################################################################################################################
+module "cloudspanner" {
+  source = "../modules/cloud_spanner"
+
+  count = var.enable_cloud_spanner ? 1 : 0
+
+  project_id      = var.project_id
+  instance_id     = var.spanner_instance_id
+  instance_config = var.spanner_instance_config
+  display_name    = var.spanner_instance_id
+
+  num_nodes        = var.spanner_num_nodes
+  processing_units = var.spanner_processing_units
+
+  database_name = var.spanner_database_name
+  database_ddl  = var.spanner_database_ddl
+
+  labels = var.spanner_labels
+
+  instance_iam_bindings = var.spanner_instance_iam_bindings
+  database_iam_bindings = var.spanner_database_iam_bindings
+}
+
