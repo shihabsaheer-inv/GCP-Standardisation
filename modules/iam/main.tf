@@ -355,10 +355,17 @@ resource "google_project_iam_member" "storage_viewer" {
 
 # CDN Service Account → Storage Object Viewer (for CDN backend)
 resource "google_project_iam_member" "cdn_storage_viewer" {
-  count   = var.grant_cdn_storage_access ? 1 : 0
+  count = var.grant_cdn_storage_access && var.cdn_origin_type != "gcs" ? 1 : 0
   project = var.project_id
   role    = "roles/storage.objectViewer"
   member  = "serviceAccount:service-${data.google_project.project.number}@cloud-cdn-fill.iam.gserviceaccount.com"
+
+  depends_on = [
+    google_project_iam_member.lb_admin,
+    google_project_iam_member.storage_viewer,
+    var.cdn_dependency
+  ]
+
 }
 
 # ─────────────────────────────────────────────────────────────────────────────

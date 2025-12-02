@@ -241,9 +241,6 @@ output "cdn_url_map" {
   value = module.cloud_cdn.url_map
 }
 
-output "cdn_backend_bucket" {
-  value = module.cloud_cdn.backend_bucket
-}
 
 output "cdn_backend_service" {
   value = module.cloud_cdn.backend_service

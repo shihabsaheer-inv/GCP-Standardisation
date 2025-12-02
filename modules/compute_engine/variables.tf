@@ -114,7 +114,7 @@ variable "instance_roles" {
   description = "Map index to role: frontend, backend, db"
   type        = map(string)
   default = {
-    0 = "frontend"
+    0 = "compute"
     1 = "backend"
     2 = "database"
   }
@@ -124,4 +124,9 @@ variable "startup_scripts" {
   description = "Startup scripts to assign based on instance role"
   type        = map(string)
   default     = {}
+}
+
+variable "ssh_username" {
+  description = "Username for SSH access"
+  type        = string
 }

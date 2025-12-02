@@ -9,12 +9,12 @@ environment = "dev"
 # ═════════════════════════════════════════════════════════════════════════════
 # MODULE TOGGLES
 # ═════════════════════════════════════════════════════════════════════════════
-enable_vpc                          = false # Set to true to enable VPC
-enable_compute_engine               = false # Set to true to enable Compute Engine
-enable_firewall                     = false # Set to true to enable Firewall
-enable_storage                      = false # Set to true to enable Cloud Storage
+enable_vpc                          = true # Set to true to enable VPC
+enable_compute_engine               = true # Set to true to enable Compute Engine
+enable_firewall                     = true # Set to true to enable Firewall
+enable_storage                      = true  # Set to true to enable Cloud Storage
 enable_cloudsql                     = false # Set to true to enable Cloud SQL
-enable_cloud_spanner                = true  # Set to true to enable Cloud Spanner
+enable_cloud_spanner                = false # Set to true to enable Cloud Spanner
 enable_cloudrun                     = false # Set to true to enable Cloud Run
 enable_cloudrun_cloudsql_connection = false # Set to true to enable Cloud SQL & Cloud Run connection
 enable_load_balancer                = false # Set to true to enable Cloud LoadBalancer
@@ -22,7 +22,7 @@ enable_artifact_registry            = false # Set to true to enable Artifact Reg
 enable_memorystore                  = false # Set to true to enable Memory Store
 enable_app_engine                   = false # Set to true to enable App Engine
 enable_gke                          = false # Set to true to enable GKE
-enable_cdn                          = false # Set to true to enable Cloud CDN
+enable_cdn                          = false  # Set to true to enable Cloud CDN
 enable_cdn_https                    = false # Set to true to enable HTTPS CDN
 enable_cloud_monitoring             = false # Set to true to enable Cloud Monitoring
 
@@ -138,7 +138,7 @@ custom_iam_bindings = {
 # ═════════════════════════════════════════════════════════════════════════════
 # VPC CONFIGURATION
 # ═════════════════════════════════════════════════════════════════════════════
-vpc_name                = "dev-vpc-new"
+vpc_name                = "dev-vpc-for-compute-storage"
 public_subnet_cidrs     = ["10.0.1.0/24", "10.0.2.0/24"]
 private_subnet_cidrs    = ["10.0.10.0/24", "10.0.11.0/24"]
 gke_pods_cidr_range     = "10.1.0.0/16" # ~65k IPs for pods
@@ -153,7 +153,7 @@ boot_disk_size              = 10
 instance_type               = "e2-medium"
 boot_disk_type              = "pd-ssd"
 image                       = "projects/debian-cloud/global/images/family/debian-12"
-associate_public_ip_address = false
+associate_public_ip_address = true
 # NOTE: This will be replaced by IAM module output
 service_account_email = "" # Leave empty - will use module.iam.compute_service_account_email
 instance_tags         = ["allow-http", "allow-ssh"]
@@ -169,8 +169,8 @@ ssh_source_ranges = ["0.0.0.0/0"] # Restrict to your IP for security
 # ═════════════════════════════════════════════════════════════════════════════
 # STORAGE CONFIGURATION
 # ═════════════════════════════════════════════════════════════════════════════
-storage_bucket_name           = "dev-static-site-terraform-setup-476004"
-storage_force_destroy         = false
+storage_bucket_name           = "dev-cdn-gcs-bucket-476004"
+storage_force_destroy         = true
 storage_enable_versioning     = false
 storage_enable_static_website = true
 storage_index_document        = "index.html"
@@ -183,7 +183,7 @@ storage_labels = {
 }
 
 enable_storage_admin_bindings  = false
-enable_storage_viewer_bindings = false
+enable_storage_viewer_bindings = true
 
 storage_admin_members = [
   "user:"
@@ -339,7 +339,7 @@ lb_name                             = "dev-lb"
 lb_negs                             = []
 lb_instance_groups                  = []
 lb_ssl_certificates                 = []
-lb_enable_cdn                       = false
+lb_enable_cdn                       = true
 lb_cloud_armor_policy               = null
 lb_create_https_listener            = false
 lb_create_http_redirect             = false
@@ -645,8 +645,10 @@ gke_node_pool_delete_timeout = "30m"
 cdn_domains = ["cdn.example.com"] # managed cert applies automatically
 
 # ORIGIN TYPE
-cdn_origin_type     = "gcs"
-cdn_gcs_bucket_name = "dev-static-site-terraform-setup-476004"
+cdn_origin_type           = "gcs"
+cdn_gcs_bucket_name       = "dev-cdn-gcs-bucket-476004"
+cdn_backend_bucket_create = true
+
 
 # CUSTOM ORIGIN (when using NEGs)
 cdn_backend_group    = null # or NEG self link
@@ -726,3 +728,5 @@ spanner_instance_iam_bindings = [
 ]
 
 spanner_database_iam_bindings = []
+
+ssh_username = ""
