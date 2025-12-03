@@ -62,35 +62,7 @@ resource "google_compute_router_nat" "nat" {
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 }
 
-# ─────────────────────────────
-# 🔌 Private Service Access for Cloud SQL
-# ─────────────────────────────
-
-# 1️⃣ Enable Service Networking API
-resource "google_project_service" "service_networking" {
-  project = var.project_id
-  service = "servicenetworking.googleapis.com"
-}
-
-# 2️⃣ Reserve an internal IP range for Google-managed services
-resource "google_compute_global_address" "private_service_range" {
-  name          = "${var.vpc_name}-private-service-range"
-  purpose       = "VPC_PEERING"
-  address_type  = "INTERNAL"
-  prefix_length = 16
-  network       = google_compute_network.vpc[0].self_link
-  project       = var.project_id
-  depends_on    = [google_project_service.service_networking]
-}
-
-# 3️⃣ Create the private VPC connection for Google-managed services
-resource "google_service_networking_connection" "private_vpc_connection" {
-  network                 = google_compute_network.vpc[0].self_link
-  service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [google_compute_global_address.private_service_range.name]
-
-  depends_on = [
-    google_project_service.service_networking,
-    google_compute_global_address.private_service_range
-  ]
-}
+#
+# Note:
+# Private Service Access (PSA) for producer services (Cloud SQL, Memorystore, etc.)
+# is now managed in the respective service modules instead of at the VPC layer.
