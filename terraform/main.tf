@@ -48,6 +48,7 @@ module "compute_engine" {
   project_id = var.project_id
   region     = var.region
   zone       = var.zone
+  ssh_username = var.ssh_username
 
   # VM settings
   instance_count       = var.instance_count
@@ -80,7 +81,7 @@ module "compute_engine" {
   }
 
   instance_roles = {
-    0 = "frontend"
+    0 = "compute-and-storage"
   }
 
   # Other
@@ -659,6 +660,10 @@ module "iam" {
 
   # Custom IAM bindings (optional)
   custom_iam_bindings = var.custom_iam_bindings
+
+  cdn_dependency  = module.cloud_cdn.cdn_ready
+  cdn_origin_type = var.cdn_origin_type
+
 }
 
 #################################################################################################################

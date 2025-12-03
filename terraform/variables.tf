@@ -178,6 +178,11 @@ variable "enable_custom_firewall" {
   default     = false
 }
 
+variable "ssh_username" {
+  description = "Username for SSH access"
+  type        = string
+}
+
 # ═════════════════════════════════════════════════════════════════════════════
 # STORAGE VARIABLES
 # ═════════════════════════════════════════════════════════════════════════════
@@ -1871,6 +1876,11 @@ variable "iam_storage_admin_members" {
   default     = []
 }
 
+variable "cdn_dependency" {
+  type    = string
+  default = null
+}
+
 variable "iam_cloudsql_admin_members" {
   description = "List of members to grant Cloud SQL Admin role"
   type        = list(string)
@@ -2004,4 +2014,9 @@ variable "spanner_database_iam_bindings" {
     members = list(string)
   }))
   default = []
+}
+
+variable "cdn_backend_bucket_create" {
+  type    = bool
+  default = true
 }
