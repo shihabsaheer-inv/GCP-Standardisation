@@ -2,7 +2,7 @@
 # COMMON VARIABLES
 # ═════════════════════════════════════════════════════════════════════════════
 region      = "us-west1"
-project_id  = "terraform-project-test124"
+project_id  = "terraform-setup-476004"
 zone        = "us-west1-a"
 environment = "dev"
 
@@ -10,11 +10,11 @@ environment = "dev"
 # MODULE TOGGLES
 # ═════════════════════════════════════════════════════════════════════════════
 enable_vpc                          = true # Set to true to enable VPC
-enable_compute_engine               = false # Set to true to enable Compute Engine
-enable_firewall                     = false # Set to true to enable Firewall
-enable_storage                      = false # Set to true to enable Cloud Storage
-enable_cloudsql                     = true # Set to true to enable Cloud SQL
-enable_cloud_spanner                = false  # Set to true to enable Cloud Spanner
+enable_compute_engine               = true # Set to true to enable Compute Engine
+enable_firewall                     = true # Set to true to enable Firewall
+enable_storage                      = true  # Set to true to enable Cloud Storage
+enable_cloudsql                     = false # Set to true to enable Cloud SQL
+enable_cloud_spanner                = false # Set to true to enable Cloud Spanner
 enable_cloudrun                     = false # Set to true to enable Cloud Run
 enable_cloudrun_cloudsql_connection = false # Set to true to enable Cloud SQL & Cloud Run connection
 enable_load_balancer                = false # Set to true to enable Cloud LoadBalancer
@@ -47,7 +47,7 @@ iam_storage_admin_members = [
 
 # Cloud SQL Administrators (manage database instances)
 iam_cloudsql_admin_members = [
-  "user:shihabshaheer8@gmail.com"
+  "user:"
   # "group:database-admins@example.com"
 ]
 
@@ -722,7 +722,7 @@ spanner_instance_iam_bindings = [
   {
     role = "roles/spanner.databaseUser"
     members = [
-      "user:shihabshaheer8@gmail.com"
+      "user:"
     ]
   }
 ]
