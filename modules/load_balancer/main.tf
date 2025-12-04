@@ -37,6 +37,14 @@ resource "google_compute_backend_service" "default" {
   log_config {
     enable = var.enable_access_logs
   }
+
+  # ✅ ADD THIS - Validates at least one backend exists
+  lifecycle {
+    precondition {
+      condition     = length(var.negs) > 0 || length(var.instance_groups) > 0
+      error_message = "Load Balancer requires at least one backend (NEG or instance group)."
+    }
+  }
 }
 
 # URL Map

@@ -12,6 +12,38 @@ provider "google" {
   zone    = var.zone
 }
 
+provider "google-beta" {
+  project = var.project_id
+  region  = var.region
+  zone    = var.zone
+}
+
+# PSA clean up
+# ✅ ADD THIS ENTIRE BLOCK - Cleanup helper for VPC peering
+/*
+resource "null_resource" "psa_cleanup" {
+  count = var.enable_cloudsql && var.enable_vpc ? 1 : 0
+
+  triggers = {
+    vpc_name   = var.vpc_name
+    project_id = var.project_id
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<-EOT
+      echo "Cleaning up Private Service Access peering..."
+      gcloud services vpc-peerings delete \
+        --service=servicenetworking.googleapis.com \
+        --network=${self.triggers.vpc_name} \
+        --project=${self.triggers.project_id} \
+        --quiet 2>/dev/null || echo "PSA already deleted or not found"
+    EOT
+  }
+
+  depends_on = [module.cloudsql]
+}
+*/
 # ─────────────────────────────
 # 🌐 VPC Module
 # ─────────────────────────────
@@ -32,6 +64,8 @@ module "vpc" {
   gke_pods_cidr_range         = var.gke_pods_cidr_range
   gke_services_range_name     = var.gke_services_secondary_range_name
   gke_services_cidr_range     = var.gke_services_cidr_range
+
+  #depends_on = [null_resource.psa_cleanup]
 }
 
 # ─────────────────────────────
@@ -209,6 +243,7 @@ module "cloud_run" {
 
   depends_on = [
     module.cloudsql,
+    module.iam, # ✅ ADDED - Cloud Run needs service account from IAM
     google_project_iam_member.cloudrun_sql_client
   ]
 }
@@ -486,7 +521,7 @@ module "gke" {
   node_pool_update_timeout = var.gke_node_pool_update_timeout
   node_pool_delete_timeout = var.gke_node_pool_delete_timeout
 
-  depends_on = [module.vpc]
+  depends_on = [module.vpc, module.iam]
 }
 
 
@@ -546,6 +581,8 @@ module "cloud_cdn" {
   enable_https     = var.enable_cdn_https
   ssl_certificates = google_compute_managed_ssl_certificate.cdn_cert[*].self_link
   global_ip        = try(google_compute_global_address.cdn_ip[0].address, null)
+
+  depends_on = [module.storage]
 }
 
 # ─────────────────────────────
@@ -630,8 +667,8 @@ module "iam" {
   grant_cdn_storage_access = var.enable_cdn && var.enable_storage
 
   # KMS Bindings
-  enable_cloudsql_kms_binding = var.enable_cloudsql && var.cloudsql_create_kms_key
-  kms_crypto_key_id           = var.enable_cloudsql && var.cloudsql_create_kms_key ? module.cloudsql[0].kms_crypto_key_id : ""
+  enable_cloudsql_kms_binding = false
+  kms_crypto_key_id           = ""
 
   enable_gke_kms_binding = var.enable_gke && var.gke_enable_database_encryption
   gke_kms_crypto_key_id  = var.gke_enable_database_encryption ? var.gke_database_encryption_key_name : ""

@@ -6,6 +6,30 @@ resource "google_compute_network" "vpc" {
   routing_mode            = "REGIONAL"
 }
 
+resource "null_resource" "psa_cleanup" {
+  count = var.enable_vpc ? 1 : 0
+
+  triggers = {
+    vpc_id   = google_compute_network.vpc[0].id
+    vpc_name = var.vpc_name
+    project  = var.project_id
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<-EOT
+      echo "Cleaning up Private Service Access peering for ${self.triggers.vpc_name}..."
+      gcloud services vpc-peerings delete \
+        --service=servicenetworking.googleapis.com \
+        --network=${self.triggers.vpc_name} \
+        --project=${self.triggers.project} \
+        --quiet 2>/dev/null || echo "No PSA peering found or already deleted"
+    EOT
+  }
+
+  depends_on = [google_compute_network.vpc]
+}
+
 # Create Public Subnets only if VPC is enabled
 resource "google_compute_subnetwork" "public_subnet" {
   count                    = var.enable_vpc ? length(var.public_subnet_cidrs) : 0
@@ -62,35 +86,7 @@ resource "google_compute_router_nat" "nat" {
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 }
 
-# ─────────────────────────────
-# 🔌 Private Service Access for Cloud SQL
-# ─────────────────────────────
-
-# 1️⃣ Enable Service Networking API
-resource "google_project_service" "service_networking" {
-  project = var.project_id
-  service = "servicenetworking.googleapis.com"
-}
-
-# 2️⃣ Reserve an internal IP range for Google-managed services
-resource "google_compute_global_address" "private_service_range" {
-  name          = "${var.vpc_name}-private-service-range"
-  purpose       = "VPC_PEERING"
-  address_type  = "INTERNAL"
-  prefix_length = 16
-  network       = google_compute_network.vpc[0].self_link
-  project       = var.project_id
-  depends_on    = [google_project_service.service_networking]
-}
-
-# 3️⃣ Create the private VPC connection for Google-managed services
-resource "google_service_networking_connection" "private_vpc_connection" {
-  network                 = google_compute_network.vpc[0].self_link
-  service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [google_compute_global_address.private_service_range.name]
-
-  depends_on = [
-    google_project_service.service_networking,
-    google_compute_global_address.private_service_range
-  ]
-}
+#
+# Note:
+# Private Service Access (PSA) for producer services (Cloud SQL, Memorystore, etc.)
+# is now managed in the respective service modules instead of at the VPC layer.

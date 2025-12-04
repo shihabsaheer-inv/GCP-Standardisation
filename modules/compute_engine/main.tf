@@ -85,5 +85,8 @@ resource "google_compute_instance_group" "instance_group" {
     name = "http"
     port = 80
   }
+
+  # ✅ ADD THIS - Ensures instances are created first
+  depends_on = [google_compute_instance.gcp_instance]
 }
 
