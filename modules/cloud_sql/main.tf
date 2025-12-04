@@ -94,6 +94,45 @@ data "google_project" "project" {
 }
 
 ##############################################################
+# 🔌 Private Service Access (PSA) for Cloud SQL
+##############################################################
+
+# Enable Service Networking API for this project (if not already enabled)
+resource "google_project_service" "service_networking" {
+  project = var.project_id
+  service = "servicenetworking.googleapis.com"
+}
+
+# Reserve an internal IP range in the VPC specifically for Google-managed services
+resource "google_compute_global_address" "private_service_range" {
+  name          = "${var.instance_name}-private-service-range"
+  purpose       = "VPC_PEERING"
+  address_type  = "INTERNAL"
+  prefix_length = 16
+  network       = var.private_network
+  project       = var.project_id
+
+  depends_on = [
+    google_project_service.service_networking
+  ]
+}
+
+# Create the private VPC connection for this VPC and PSA range
+resource "google_service_networking_connection" "private_vpc_connection" {
+  network                 = var.private_network
+  service                 = "servicenetworking.googleapis.com"
+  reserved_peering_ranges = [google_compute_global_address.private_service_range.name]
+  
+  # ✅ ADD THIS LINE - Prevents orphaned peering during destroy
+  deletion_policy = "ABANDON"
+
+  depends_on = [
+    google_project_service.service_networking,
+    google_compute_global_address.private_service_range
+  ]
+}
+
+##############################################################
 # 🗄️ Cloud SQL Instance
 ##############################################################
 resource "google_sql_database_instance" "this" {
@@ -174,7 +213,8 @@ resource "google_sql_database_instance" "this" {
   deletion_protection = var.deletion_protection
 
   depends_on = [
-    google_kms_crypto_key_iam_member.cloudsql_kms
+    google_kms_crypto_key_iam_member.cloudsql_kms,
+    google_service_networking_connection.private_vpc_connection
   ]
 
   lifecycle {

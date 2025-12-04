@@ -377,23 +377,3 @@ variable "service_usage_consumer_members" {
 }
 
 
-variable "cdn_backend_bucket" {
-  type = string
-  default = null
-}
-
-variable "cdn_url_map" {
-  type = string
-  default = null
-}
-
-variable "cdn_dependency" {
-  type    = string
-  default = null
-}
-
-variable "cdn_origin_type" {
-  type        = string
-  default     = "gcs"
-  description = "CDN origin type (gcs or custom)"
-}
