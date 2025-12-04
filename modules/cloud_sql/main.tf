@@ -122,6 +122,9 @@ resource "google_service_networking_connection" "private_vpc_connection" {
   network                 = var.private_network
   service                 = "servicenetworking.googleapis.com"
   reserved_peering_ranges = [google_compute_global_address.private_service_range.name]
+  
+  # ✅ ADD THIS LINE - Prevents orphaned peering during destroy
+  deletion_policy = "ABANDON"
 
   depends_on = [
     google_project_service.service_networking,

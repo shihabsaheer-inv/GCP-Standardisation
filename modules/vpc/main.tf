@@ -6,6 +6,30 @@ resource "google_compute_network" "vpc" {
   routing_mode            = "REGIONAL"
 }
 
+resource "null_resource" "psa_cleanup" {
+  count = var.enable_vpc ? 1 : 0
+
+  triggers = {
+    vpc_id   = google_compute_network.vpc[0].id
+    vpc_name = var.vpc_name
+    project  = var.project_id
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<-EOT
+      echo "Cleaning up Private Service Access peering for ${self.triggers.vpc_name}..."
+      gcloud services vpc-peerings delete \
+        --service=servicenetworking.googleapis.com \
+        --network=${self.triggers.vpc_name} \
+        --project=${self.triggers.project} \
+        --quiet 2>/dev/null || echo "No PSA peering found or already deleted"
+    EOT
+  }
+
+  depends_on = [google_compute_network.vpc]
+}
+
 # Create Public Subnets only if VPC is enabled
 resource "google_compute_subnetwork" "public_subnet" {
   count                    = var.enable_vpc ? length(var.public_subnet_cidrs) : 0
