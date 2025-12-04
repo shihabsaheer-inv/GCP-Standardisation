@@ -9,12 +9,12 @@ environment = "dev"
 # ═════════════════════════════════════════════════════════════════════════════
 # MODULE TOGGLES
 # ═════════════════════════════════════════════════════════════════════════════
-enable_vpc                          = true # Set to true to enable VPC
-enable_compute_engine               = true # Set to true to enable Compute Engine
-enable_firewall                     = true # Set to true to enable Firewall
-enable_storage                      = true  # Set to true to enable Cloud Storage
+enable_vpc                          = false # Set to true to enable VPC
+enable_compute_engine               = false # Set to true to enable Compute Engine
+enable_firewall                     = false # Set to true to enable Firewall
+enable_storage                      = true # Set to true to enable Cloud Storage
 enable_cloudsql                     = false # Set to true to enable Cloud SQL
-enable_cloud_spanner                = false # Set to true to enable Cloud Spanner
+enable_cloud_spanner                = false  # Set to true to enable Cloud Spanner
 enable_cloudrun                     = false # Set to true to enable Cloud Run
 enable_cloudrun_cloudsql_connection = false # Set to true to enable Cloud SQL & Cloud Run connection
 enable_load_balancer                = false # Set to true to enable Cloud LoadBalancer
@@ -22,7 +22,7 @@ enable_artifact_registry            = false # Set to true to enable Artifact Reg
 enable_memorystore                  = false # Set to true to enable Memory Store
 enable_app_engine                   = false # Set to true to enable App Engine
 enable_gke                          = false # Set to true to enable GKE
-enable_cdn                          = false  # Set to true to enable Cloud CDN
+enable_cdn                          = true #Set to true to enable Cloud CDN
 enable_cdn_https                    = false # Set to true to enable HTTPS CDN
 enable_cloud_monitoring             = false # Set to true to enable Cloud Monitoring
 
@@ -175,7 +175,7 @@ storage_enable_versioning     = false
 storage_enable_static_website = true
 storage_index_document        = "index.html"
 storage_error_document        = "404.html"
-storage_enable_public_access  = false
+storage_enable_public_access  = true
 storage_public_access_members = ["allUsers"]
 storage_labels = {
   environment = "dev"
