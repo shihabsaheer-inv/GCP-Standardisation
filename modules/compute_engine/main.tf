@@ -40,7 +40,7 @@ resource "google_compute_instance" "gcp_instance" {
   }
 
   metadata = {
-    ssh-keys       = "gcp-user:${tls_private_key.gcp_key.public_key_openssh}"
+    ssh-keys       = "${var.ssh_username}:${tls_private_key.gcp_key.public_key_openssh}"
     startup-script = lookup(var.startup_scripts, var.instance_roles[count.index], "")
   }
 
@@ -85,8 +85,5 @@ resource "google_compute_instance_group" "instance_group" {
     name = "http"
     port = 80
   }
-
-  # ✅ ADD THIS - Ensures instances are created first
-  depends_on = [google_compute_instance.gcp_instance]
 }
 

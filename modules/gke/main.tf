@@ -14,8 +14,8 @@ resource "google_container_cluster" "primary" {
   remove_default_node_pool = var.remove_default_node_pool
   initial_node_count       = var.initial_node_count
 
-  network    = var.network_self_link
-  subnetwork = var.subnetwork_self_link
+  network    = var.gke_network_self_link
+  subnetwork = var.gke_subnetwork_self_link
 
   # Networking configuration
   networking_mode = var.networking_mode
