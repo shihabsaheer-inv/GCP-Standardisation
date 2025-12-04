@@ -125,3 +125,7 @@ variable "startup_scripts" {
   type        = map(string)
   default     = {}
 }
+
+variable "ssh_username" {
+  default = ""
+}
